@@ -10,6 +10,9 @@
   },
   "type": "module",
   "main": "dist/server.js",
+  "bin": {
+    "sap-help-mcp": "dist/server.js"
+  },
   "files": [
     "dist"
   ],
