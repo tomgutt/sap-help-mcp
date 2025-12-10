@@ -90,11 +90,9 @@ function createServer() {
   const srv = new Server(
     {
       name: "SAP Help MCP",
-      description: "Minimal MCP server exposing SAP Help search and retrieval tools",
       version: "0.1.0"
     },
     {
-      protocolVersions: ["2025-07-09"],
       capabilities: {
         tools: {}
       }
