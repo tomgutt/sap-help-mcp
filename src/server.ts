@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+import { readFileSync } from "fs";
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
@@ -6,6 +9,13 @@ import {
   ListToolsRequestSchema
 } from "@modelcontextprotocol/sdk/types.js";
 import { getSapHelpContent, searchSapHelp } from "./lib/sapHelp.js";
+
+// Read version from package.json
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const packageJsonPath = join(__dirname, "..", "package.json");
+const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf-8"));
+const version = packageJson.version;
 
 // Environment variables with defaults
 const SEARCH_SNIPPET_CHARS = Number(process.env.SEARCH_SNIPPET_CHARS || 400);
@@ -94,7 +104,7 @@ function createServer() {
   const srv = new Server(
     {
       name: "SAP Docs MCP",
-      version: "0.1.0"
+      version
     },
     {
       capabilities: {
