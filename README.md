@@ -17,7 +17,7 @@ npm start   # runs node dist/server.js
 ```json
 {
   "mcpServers": {
-    "sap-help": {
+    "sap-help-mcp": {
       "command": "node",
       "args": ["/absolute/path/to/dist/server.js"]
     }
@@ -29,9 +29,9 @@ npm start   # runs node dist/server.js
 ```json
 {
   "mcpServers": {
-    "sap-help": {
+    "sap-help-mcp": {
       "command": "npx",
-      "args": ["-y", "mcp-sap-help"]
+      "args": ["-y", "sap-help-mcp"]
     }
   }
 }
