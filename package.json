@@ -1,6 +1,6 @@
 {
   "name": "sap-help-mcp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Minimal MCP server exposing SAP Help documentation search and fetch tools",
   "author": "Tom Guttermann",
   "license": "MIT",
