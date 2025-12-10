@@ -1,12 +1,12 @@
 {
-  "name": "mcp-sap-help",
+  "name": "sap-docs-mcp",
   "version": "0.1.0",
-  "description": "Minimal MCP server exposing SAP Help search and fetch tools",
+  "description": "Minimal MCP server exposing SAP Help documentation search and fetch tools",
   "author": "Tom Guttermann",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/tomgutt/mcp-sap-help.git"
+    "url": "https://github.com/tomgutt/sap-docs-mcp.git"
   },
   "type": "module",
   "main": "dist/server.js",

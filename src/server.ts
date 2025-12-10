@@ -89,7 +89,7 @@ function createErrorResponse(error: string) {
 function createServer() {
   const srv = new Server(
     {
-      name: "SAP Help MCP",
+      name: "SAP Docs MCP",
       version: "0.1.0"
     },
     {
