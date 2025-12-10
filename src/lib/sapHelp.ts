@@ -80,6 +80,7 @@ export async function searchSapHelp(query: string): Promise<SearchResponse> {
       };
     }
 
+    // Store the search results for later retrieval
     const searchResults: SearchResult[] = results.map((hit, index) => ({
       library_id: `sap-help-${hit.loio}`,
       topic: '',
@@ -100,6 +101,15 @@ export async function searchSapHelp(query: string): Promise<SearchResponse> {
       totalSnippets: 1,
       source: "help"
     }));
+
+    // Store the full search results in a simple cache for retrieval
+    // In a real implementation, you might want a more sophisticated cache
+    if (!global.sapHelpSearchCache) {
+      global.sapHelpSearchCache = new Map();
+    }
+    results.forEach(hit => {
+      global.sapHelpSearchCache!.set(hit.loio, hit);
+    });
 
     // Format response similar to other search functions
     const formattedResults = searchResults.slice(0, 20).map((result, i) => 
@@ -146,39 +156,45 @@ export async function getSapHelpContent(resultId: string): Promise<string> {
       throw new Error("Invalid SAP Help result ID. Use an ID from sap_help_search results.");
     }
 
-    // Always fetch fresh data; no cache
-    const searchParams = {
-      transtype: "standard,html,pdf,others", 
-      state: "PRODUCTION,TEST,DRAFT",
-      product: "",
-      version: "",
-      q: loio, // Search by loio to find the specific document
-      to: "19",
-      area: "content",
-      advancedSearch: "0",
-      excludeNotSearchable: "1",
-      language: "en-US",
-    };
-
-    const searchUrl = `${BASE}/http.svc/elasticsearch?${toQuery(searchParams)}`;
-    const searchResponse = await fetch(searchUrl, {
-      headers: {
-        Accept: "application/json",
-        "User-Agent": "sap-help-mcp/help-get",
-        Referer: BASE,
-      },
-    });
-
-    if (!searchResponse.ok) {
-      throw new Error(`Failed to find document: ${searchResponse.status} ${searchResponse.statusText}`);
-    }
-
-    const searchData: SapHelpSearchResponse = await searchResponse.json();
-    const results = searchData?.data?.results || [];
-    const hit = results.find(r => r.loio === loio);
+    // First try to get from cache
+    const cache = global.sapHelpSearchCache || new Map();
+    let hit = cache.get(loio);
 
     if (!hit) {
-      throw new Error(`Document with loio ${loio} not found`);
+      // If not in cache, search again to get the full hit data
+      const searchParams = {
+        transtype: "standard,html,pdf,others", 
+        state: "PRODUCTION,TEST,DRAFT",
+        product: "",
+        version: "",
+        q: loio, // Search by loio to find the specific document
+        to: "19",
+        area: "content",
+        advancedSearch: "0",
+        excludeNotSearchable: "1",
+        language: "en-US",
+      };
+
+      const searchUrl = `${BASE}/http.svc/elasticsearch?${toQuery(searchParams)}`;
+      const searchResponse = await fetch(searchUrl, {
+        headers: {
+          Accept: "application/json",
+          "User-Agent": "sap-help-mcp/help-get",
+          Referer: BASE,
+        },
+      });
+
+      if (!searchResponse.ok) {
+        throw new Error(`Failed to find document: ${searchResponse.status} ${searchResponse.statusText}`);
+      }
+
+      const searchData: SapHelpSearchResponse = await searchResponse.json();
+      const results = searchData?.data?.results || [];
+      hit = results.find(r => r.loio === loio);
+
+      if (!hit) {
+        throw new Error(`Document with loio ${loio} not found`);
+      }
     }
 
     // Prepare metadata request parameters
