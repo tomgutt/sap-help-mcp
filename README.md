@@ -13,9 +13,29 @@ npm run build
 npm start   # runs node dist/server.js
 ```
 
-### Example client configs
-- Command: `node`
-- Args: `["/absolute/path/to/dist/server.js"]`
+### Example MCP client config (stdio)
+```json
+{
+  "mcpServers": {
+    "sap-help": {
+      "command": "node",
+      "args": ["/absolute/path/to/dist/server.js"]
+    }
+  }
+}
+```
+
+### Example MCP client config (npx)
+```json
+{
+  "mcpServers": {
+    "sap-help": {
+      "command": "npx",
+      "args": ["-y", "mcp-sap-help"]
+    }
+  }
+}
+```
 
 ## Publish hint
 Package is set up as an npm module with `main` pointing to `dist/server.js`; run `npm run build` before publishing.
