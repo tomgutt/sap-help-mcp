@@ -36,6 +36,3 @@ npm start   # runs node dist/server.js
   }
 }
 ```
-
-## Publish hint
-Package is set up as an npm module with `main` pointing to `dist/server.js`; run `npm run build` before publishing.
