@@ -6,6 +6,9 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import { getSapHelpContent, searchSapHelp } from "./lib/sapHelp.js";
 
+// Environment variables with defaults
+const SEARCH_SNIPPET_CHARS = Number(process.env.SEARCH_SNIPPET_CHARS || 400);
+
 type SearchResult = {
   id: string;
   title: string;
@@ -151,19 +154,23 @@ function createServer() {
         );
       }
 
-      const helpResults: SearchResult[] = res.results.map((r, index) => ({
-        id: r.id || `sap-help-${index}`,
-        title: r.title || "SAP Help Document",
-        url: r.url || `#${r.id}`,
-        snippet: r.description
-          ? r.description.substring(0, 200) + "..."
-          : "",
-        metadata: {
-          source: "sap-help",
-          totalSnippets: r.totalSnippets,
-          rank: index + 1
+      const helpResults: SearchResult[] = res.results.map((r, index) => {
+        let snippet = r.description || "";
+        if (snippet.length > SEARCH_SNIPPET_CHARS) {
+          snippet = snippet.substring(0, SEARCH_SNIPPET_CHARS) + "...";
         }
-      }));
+        return {
+          id: r.id || `sap-help-${index}`,
+          title: r.title || "SAP Help Document",
+          url: r.url || `#${r.id}`,
+          snippet,
+          metadata: {
+            source: "sap-help",
+            totalSnippets: r.totalSnippets,
+            rank: index + 1
+          }
+        };
+      });
 
       return createSearchResponse(helpResults);
     }

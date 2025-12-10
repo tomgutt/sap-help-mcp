@@ -13,17 +13,13 @@ npm run build
 npm start   # runs node dist/server.js
 ```
 
-### Example MCP client config (stdio)
-```json
-{
-  "mcpServers": {
-    "sap-help-mcp": {
-      "command": "node",
-      "args": ["/absolute/path/to/dist/server.js"]
-    }
-  }
-}
-```
+## Configuration
+
+The server supports the following optional environment variables:
+
+- **`SEARCH_RESULTS`** (default: `20`) - Maximum number of search results to return
+- **`SEARCH_PRODUCT`** (default: `""`) - Filter search results by product name
+- **`SEARCH_SNIPPET_CHARS`** (default: `400`) - Maximum length of snippet text in characters
 
 ### Example MCP client config (npx)
 ```json
@@ -31,7 +27,12 @@ npm start   # runs node dist/server.js
   "mcpServers": {
     "sap-help-mcp": {
       "command": "npx",
-      "args": ["-y", "sap-help-mcp"]
+      "args": ["-y", "sap-help-mcp"],
+      "env": {
+        "SEARCH_RESULTS": "10",
+        "SEARCH_PRODUCT": "LEANIX",
+        "SEARCH_SNIPPET_CHARS": "800"
+      }
     }
   }
 }

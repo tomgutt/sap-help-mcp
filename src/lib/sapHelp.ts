@@ -9,6 +9,10 @@ import { truncateContent } from "./truncate.js";
 
 const BASE = "https://help.sap.com";
 
+// Environment variables with defaults
+const SEARCH_RESULTS = Number(process.env.SEARCH_RESULTS || 20);
+const SEARCH_PRODUCT = process.env.SEARCH_PRODUCT || "";
+
 // ---------- Utils ----------
 function toQuery(params: Record<string, any>): string {
   return Object.entries(params)
@@ -43,13 +47,16 @@ function parseDocsPathParts(urlOrPath: string): { productUrlSeg: string; deliver
  */
 export async function searchSapHelp(query: string): Promise<SearchResponse> {
   try {
+    // Calculate 'to' parameter (0-based index, so SEARCH_RESULTS=20 means to="19")
+    const toIndex = Math.max(0, SEARCH_RESULTS - 1);
+    
     const searchParams = {
       transtype: "standard,html,pdf,others",
       state: "PRODUCTION,TEST,DRAFT",
-      product: "",
+      product: SEARCH_PRODUCT,
       version: "",
       q: query,
-      to: "19", // Limit to 20 results (0-19)
+      to: String(toIndex),
       area: "content",
       advancedSearch: "0",
       excludeNotSearchable: "1",
@@ -112,7 +119,7 @@ export async function searchSapHelp(query: string): Promise<SearchResponse> {
     });
 
     // Format response similar to other search functions
-    const formattedResults = searchResults.slice(0, 20).map((result, i) => 
+    const formattedResults = searchResults.slice(0, SEARCH_RESULTS).map((result, i) => 
       `[${i}] **${result.title}**\n   ID: \`${result.id}\`\n   URL: ${result.url}\n   ${result.description}\n`
     ).join('\n');
 
@@ -162,13 +169,14 @@ export async function getSapHelpContent(resultId: string): Promise<string> {
 
     if (!hit) {
       // If not in cache, search again to get the full hit data
+      const toIndex = Math.max(0, SEARCH_RESULTS - 1);
       const searchParams = {
         transtype: "standard,html,pdf,others", 
         state: "PRODUCTION,TEST,DRAFT",
-        product: "",
+        product: SEARCH_PRODUCT,
         version: "",
         q: loio, // Search by loio to find the specific document
-        to: "19",
+        to: String(toIndex),
         area: "content",
         advancedSearch: "0",
         excludeNotSearchable: "1",
